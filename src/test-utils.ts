@@ -66,7 +66,7 @@ export function createMockSandbox(options: {
   // Default: return empty stdout (not mounted), unless mounted: true
   const startProcessMock = vi.fn().mockResolvedValue(
     options.mounted 
-      ? createMockProcess('s3fs on /data/openclaw type fuse.s3fs (rw,nosuid,nodev,relatime,user_id=0,group_id=0)\n')
+      ? createMockProcess('s3fs on /data/clawd type fuse.s3fs (rw,nosuid,nodev,relatime,user_id=0,group_id=0)\n')
       : createMockProcess('')
   );
   

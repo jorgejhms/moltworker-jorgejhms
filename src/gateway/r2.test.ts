@@ -77,7 +77,7 @@ describe('mountR2Storage', () => {
       expect(result).toBe(true);
       expect(mountBucketMock).toHaveBeenCalledWith(
         'openclaw-data',
-        '/data/openclaw',
+        '/data/clawd',
         {
           endpoint: 'https://account123.r2.cloudflarestorage.com',
           credentials: {
@@ -98,7 +98,7 @@ describe('mountR2Storage', () => {
       expect(mountBucketMock).not.toHaveBeenCalled();
       expect(console.log).toHaveBeenCalledWith(
         'R2 bucket already mounted at',
-        '/data/openclaw'
+        '/data/clawd'
       );
     });
 
@@ -137,7 +137,7 @@ describe('mountR2Storage', () => {
       const { sandbox, mountBucketMock, startProcessMock } = createMockSandbox();
       startProcessMock
         .mockResolvedValueOnce(createMockProcess(''))
-        .mockResolvedValueOnce(createMockProcess('s3fs on /data/openclaw type fuse.s3fs\n'));
+        .mockResolvedValueOnce(createMockProcess('s3fs on /data/clawd type fuse.s3fs\n'));
       
       mountBucketMock.mockRejectedValue(new Error('Transient error'));
       
