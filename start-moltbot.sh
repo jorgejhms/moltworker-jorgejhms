@@ -93,7 +93,19 @@ else
     echo "R2 not mounted, starting fresh"
 fi
 
+# Restore full workspace from R2 backup if available (only if R2 is newer)
+WORKSPACE_DIR="/root/clawd"
+if [ -d "$BACKUP_DIR/clawd" ] && [ "$(ls -A $BACKUP_DIR/clawd 2>/dev/null)" ]; then
+    if should_restore_from_r2; then
+        echo "Restoring workspace from $BACKUP_DIR/clawd..."
+        mkdir -p "$WORKSPACE_DIR"
+        cp -a "$BACKUP_DIR/clawd/." "$WORKSPACE_DIR/"
+        echo "Restored workspace from R2 backup"
+    fi
+fi
+
 # Restore skills from R2 backup if available (only if R2 is newer)
+# Legacy: kept for backups that only have /skills/ without full workspace
 SKILLS_DIR="/root/clawd/skills"
 if [ -d "$BACKUP_DIR/skills" ] && [ "$(ls -A $BACKUP_DIR/skills 2>/dev/null)" ]; then
     if should_restore_from_r2; then

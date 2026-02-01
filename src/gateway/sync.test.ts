@@ -114,6 +114,9 @@ describe('syncToR2', () => {
       expect(rsyncCall).toContain('--delete');
       expect(rsyncCall).toContain('/root/.openclaw/');
       expect(rsyncCall).toContain('/data/clawd/');
+      // Verify full workspace backup
+      expect(rsyncCall).toContain('/root/clawd/');
+      expect(rsyncCall).toContain('/data/clawd/clawd/');
     });
   });
 });
