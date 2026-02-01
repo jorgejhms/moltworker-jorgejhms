@@ -11,7 +11,7 @@ Run [OpenClaw](https://github.com/openclaw/openclaw) (formerly Moltbot, formerly
 ## Requirements
 
 - [Workers Paid plan](https://www.cloudflare.com/plans/developer-platform/) ($5 USD/month) — required for Cloudflare Sandbox containers
-- [Anthropic API key](https://console.anthropic.com/) — for Claude access, or you can use AI Gateway's [Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/)
+- Z.AI API key (default provider), or Anthropic API key, or AI Gateway's [Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/)
 
 The following Cloudflare features used by this project have free tiers:
 - Cloudflare Access (authentication)
@@ -43,18 +43,21 @@ _Cloudflare Sandboxes are available on the [Workers Paid plan](https://dash.clou
 # Install dependencies
 npm install
 
-# Set your API key (direct Anthropic access)
-npx wrangler secret put ANTHROPIC_API_KEY
+# Set your API key (direct Z.AI access)
+npx wrangler secret put ZAI_API_KEY
 
 # Or use AI Gateway instead (see "Optional: Cloudflare AI Gateway" below)
 # npx wrangler secret put AI_GATEWAY_API_KEY
 # npx wrangler secret put AI_GATEWAY_BASE_URL
 
+# Optional fallback provider
+# npx wrangler secret put ANTHROPIC_API_KEY
+
 # Generate and set a gateway token (required for remote access)
 # Save this token - you'll need it to access the Control UI
-export MOLTBOT_GATEWAY_TOKEN=$(openssl rand -hex 32)
-echo "Your gateway token: $MOLTBOT_GATEWAY_TOKEN"
-echo "$MOLTBOT_GATEWAY_TOKEN" | npx wrangler secret put MOLTBOT_GATEWAY_TOKEN
+export OPENCLAW_GATEWAY_TOKEN=$(openssl rand -hex 32)
+echo "Your gateway token: $OPENCLAW_GATEWAY_TOKEN"
+echo "$OPENCLAW_GATEWAY_TOKEN" | npx wrangler secret put OPENCLAW_GATEWAY_TOKEN
 
 # Deploy
 npm run deploy
@@ -87,7 +90,7 @@ To use the admin UI at `/_admin/` for device management, you need to:
 The easiest way to protect your worker is using the built-in Cloudflare Access integration for workers.dev:
 
 1. Go to the [Workers & Pages dashboard](https://dash.cloudflare.com/?to=/:account/workers-and-pages)
-2. Select your Worker (e.g., `moltbot-sandbox`)
+2. Select your Worker (e.g., `openclaw-sandbox`)
 3. In **Settings**, under **Domains & Routes**, in the `workers.dev` row, click the meatballs menu (`...`)
 4. Click **Enable Cloudflare Access**
 5. Click **Manage Cloudflare Access** to configure who can access:
@@ -124,7 +127,7 @@ If you prefer more control, you can manually create an Access application:
 1. Go to [Cloudflare Zero Trust Dashboard](https://one.dash.cloudflare.com/)
 2. Navigate to **Access** > **Applications**
 3. Create a new **Self-hosted** application
-4. Set the application domain to your Worker URL (e.g., `moltbot-sandbox.your-subdomain.workers.dev`)
+4. Set the application domain to your Worker URL (e.g., `openclaw-sandbox.your-subdomain.workers.dev`)
 5. Add paths to protect: `/_admin/*`, `/api/*`, `/debug/*`
 6. Configure your desired identity providers (e.g., email OTP, Google, GitHub)
 7. Copy the **Application Audience (AUD)** tag and set the secrets as shown above
@@ -140,7 +143,7 @@ DEBUG_ROUTES=true           # Enable /debug/* routes (optional)
 
 ## Authentication
 
-By default, moltbot uses **device pairing** for authentication. When a new device (browser, CLI, etc.) connects, it must be approved via the admin UI at `/_admin/`.
+By default, OpenClaw uses **device pairing** for authentication. When a new device (browser, CLI, etc.) connects, it must be approved via the admin UI at `/_admin/`.
 
 ### Device Pairing
 
@@ -166,14 +169,14 @@ For local development only, set `DEV_MODE=true` in `.dev.vars` to skip Cloudflar
 
 ## Persistent Storage (R2)
 
-By default, moltbot data (configs, paired devices, conversation history) is lost when the container restarts. To enable persistent storage across sessions, configure R2:
+By default, OpenClaw data (configs, paired devices, conversation history) is lost when the container restarts. To enable persistent storage across sessions, configure R2:
 
 ### 1. Create R2 API Token
 
 1. Go to **R2** > **Overview** in the [Cloudflare Dashboard](https://dash.cloudflare.com/)
 2. Click **Manage R2 API Tokens**
 3. Create a new token with **Object Read & Write** permissions
-4. Select the `moltbot-data` bucket (created automatically on first deploy)
+4. Select the `openclaw-data` bucket (created automatically on first deploy)
 5. Copy the **Access Key ID** and **Secret Access Key**
 
 ### 2. Set Secrets
@@ -196,18 +199,18 @@ To find your Account ID: Go to the [Cloudflare Dashboard](https://dash.cloudflar
 R2 storage uses a backup/restore approach for simplicity:
 
 **On container startup:**
-- If R2 is mounted and contains backup data, it's restored to the moltbot config directory
+- If R2 is mounted and contains backup data, it's restored to the OpenClaw config directory
 - OpenClaw uses its default paths (no special configuration needed)
 
 **During operation:**
-- A cron job runs every 5 minutes to sync the moltbot config to R2
+- A cron job runs every 5 minutes to sync the OpenClaw config to R2
 - You can also trigger a manual backup from the admin UI at `/_admin/`
 
 **In the admin UI:**
 - When R2 is configured, you'll see "Last backup: [timestamp]"
 - Click "Backup Now" to trigger an immediate sync
 
-Without R2 credentials, moltbot still works but uses ephemeral storage (data lost on container restart).
+Without R2 credentials, OpenClaw still works but uses ephemeral storage (data lost on container restart).
 
 ## Container Lifecycle
 
@@ -228,7 +231,7 @@ When the container sleeps, the next request will trigger a cold start. If you ha
 
 Access the admin UI at `/_admin/` to:
 - **R2 Storage Status** - Shows if R2 is configured, last backup time, and a "Backup Now" button
-- **Restart Gateway** - Kill and restart the moltbot gateway process
+- **Restart Gateway** - Kill and restart the OpenClaw gateway process
 - **Device Pairing** - View pending requests, approve devices individually or all at once, view paired devices
 
 The admin UI requires Cloudflare Access authentication (or `DEV_MODE=true` for local development).
@@ -239,7 +242,7 @@ Debug endpoints are available at `/debug/*` when enabled (requires `DEBUG_ROUTES
 
 - `GET /debug/processes` - List all container processes
 - `GET /debug/logs?id=<process_id>` - Get logs for a specific process
-- `GET /debug/version` - Get container and moltbot version info
+- `GET /debug/version` - Get container and OpenClaw version info
 
 ## Optional: Chat Channels
 
@@ -353,7 +356,7 @@ npx wrangler secret put AI_GATEWAY_BASE_URL
 npm run deploy
 ```
 
-The `AI_GATEWAY_*` variables take precedence over `ANTHROPIC_*` if both are set.
+The `AI_GATEWAY_*` variables take precedence over direct provider keys if both are set.
 
 ## All Secrets Reference
 
@@ -361,12 +364,13 @@ The `AI_GATEWAY_*` variables take precedence over `ANTHROPIC_*` if both are set.
 |--------|----------|-------------|
 | `AI_GATEWAY_API_KEY` | Yes* | API key for your AI Gateway provider (requires `AI_GATEWAY_BASE_URL`) |
 | `AI_GATEWAY_BASE_URL` | Yes* | AI Gateway endpoint URL (required when using `AI_GATEWAY_API_KEY`) |
-| `ANTHROPIC_API_KEY` | Yes* | Direct Anthropic API key (fallback if AI Gateway not configured) |
+| `ZAI_API_KEY` | Yes* | Direct Z.AI API key (default provider) |
+| `ANTHROPIC_API_KEY` | No | Direct Anthropic API key (optional fallback) |
 | `ANTHROPIC_BASE_URL` | No | Direct Anthropic API base URL (fallback) |
 | `OPENAI_API_KEY` | No | OpenAI API key (alternative provider) |
 | `CF_ACCESS_TEAM_DOMAIN` | Yes* | Cloudflare Access team domain (required for admin UI) |
 | `CF_ACCESS_AUD` | Yes* | Cloudflare Access application audience (required for admin UI) |
-| `MOLTBOT_GATEWAY_TOKEN` | Yes | Gateway token for authentication (pass via `?token=` query param) |
+| `OPENCLAW_GATEWAY_TOKEN` | Yes | Gateway token for authentication (pass via `?token=` query param) |
 | `DEV_MODE` | No | Set to `true` to skip CF Access auth + device pairing (local dev only) |
 | `DEBUG_ROUTES` | No | Set to `true` to enable `/debug/*` routes |
 | `SANDBOX_SLEEP_AFTER` | No | Container sleep timeout: `never` (default) or duration like `10m`, `1h` |

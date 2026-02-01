@@ -6,13 +6,13 @@ import type { Sandbox, Process } from '@cloudflare/sandbox';
 import type { MoltbotEnv } from './types';
 
 /**
- * Create a minimal MoltbotEnv object for testing
+ * Create a minimal OpenClaw env object for testing
  */
 export function createMockEnv(overrides: Partial<MoltbotEnv> = {}): MoltbotEnv {
   return {
     Sandbox: {} as any,
     ASSETS: {} as any,
-    MOLTBOT_BUCKET: {} as any,
+    OPENCLAW_BUCKET: {} as any,
     ...overrides,
   };
 }
@@ -66,7 +66,7 @@ export function createMockSandbox(options: {
   // Default: return empty stdout (not mounted), unless mounted: true
   const startProcessMock = vi.fn().mockResolvedValue(
     options.mounted 
-      ? createMockProcess('s3fs on /data/moltbot type fuse.s3fs (rw,nosuid,nodev,relatime,user_id=0,group_id=0)\n')
+      ? createMockProcess('s3fs on /data/openclaw type fuse.s3fs (rw,nosuid,nodev,relatime,user_id=0,group_id=0)\n')
       : createMockProcess('')
   );
   

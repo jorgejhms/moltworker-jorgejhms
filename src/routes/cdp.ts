@@ -197,7 +197,7 @@ cdp.get('/', async (c) => {
 /**
  * GET /json/version - CDP discovery endpoint
  * 
- * Returns browser version info and WebSocket URL for Moltbot/Playwright compatibility.
+ * Returns browser version info and WebSocket URL for OpenClaw/Playwright compatibility.
  * Authentication: Pass secret as query param `?secret=<CDP_SECRET>`
  */
 cdp.get('/json/version', async (c) => {
@@ -241,7 +241,7 @@ cdp.get('/json/version', async (c) => {
 /**
  * GET /json/list - List available targets (tabs)
  * 
- * Returns a list of available browser targets for Moltbot/Playwright compatibility.
+ * Returns a list of available browser targets for OpenClaw/Playwright compatibility.
  * Note: Since we create targets on-demand per WebSocket connection, this returns
  * a placeholder target that will be created when connecting.
  * Authentication: Pass secret as query param `?secret=<CDP_SECRET>`

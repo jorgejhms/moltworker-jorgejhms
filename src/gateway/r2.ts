@@ -55,7 +55,7 @@ export async function mountR2Storage(sandbox: Sandbox, env: MoltbotEnv): Promise
         secretAccessKey: env.R2_SECRET_ACCESS_KEY,
       },
     });
-    console.log('R2 bucket mounted successfully - moltbot data will persist across sessions');
+    console.log('R2 bucket mounted successfully - OpenClaw data will persist across sessions');
     return true;
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : String(err);
@@ -67,7 +67,7 @@ export async function mountR2Storage(sandbox: Sandbox, env: MoltbotEnv): Promise
       return true;
     }
     
-    // Don't fail if mounting fails - moltbot can still run without persistent storage
+    // Don't fail if mounting fails - OpenClaw can still run without persistent storage
     console.error('Failed to mount R2 bucket:', err);
     return false;
   }
